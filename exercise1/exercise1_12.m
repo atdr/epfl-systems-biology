@@ -44,7 +44,7 @@ P2solution(2).label = 'aerobic';
 %% Part 1 - export glucose substrate data
 
 for cnt = 1:numel(P1solution)
-    writetable(table(model.rxns,P1solution(cnt).data(1).solution.x), [P1solution(cnt).label '_flux_data.csv']);
+    writetable(table(model.rxns,P1solution(cnt).data(1).solution.x), [pwd '/out/' P1solution(cnt).label '_flux_data.csv']);
 end
 
 %% functions
