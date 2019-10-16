@@ -52,6 +52,9 @@ for subIndex = 1:numel(subs)
             
         end
     end
+    
+    % now we're done with this substrate, reset its flux to 0
+    model = changeRxnBounds(model,sub,0,'b');
 end
 
 %% create plots
