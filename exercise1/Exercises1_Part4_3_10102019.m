@@ -73,24 +73,24 @@ for subIndex = 1:numel(subs)
     sz = size(sol(subIndex).growthRates);
     figure
     plot([0:sz(1)-1], sol(subIndex).growthRates(:,20+1))
-    xlabel(sprintf('%s uptake rate / mmol.g_{DW}^{-1}.h^{-1}',subName))
+    xlabel('uptake rate')
     ylabel('growth yield / h^{-1}')
-    figExport(8,8,sprintf('%s-yield-ox20',subName))
+    figExport(5,5,sprintf('%s-yield-ox20',subName))
     
     % plot phenotypic phase plane (3D)
     figure
     surfl([0:sz(2)-1],[0:sz(1)-1], sol(subIndex).growthRates)
-    xlabel('oxygen uptake rate / mmol.g_{DW}^{-1}.h^{-1}')
-    ylabel(sprintf('%s uptake rate / mmol.g_{DW}^{-1}.h^{-1}',subName))
+    xlabel('oxygen')
+    ylabel(subName)
     zlabel('growth yield / h^{-1}')
-    figExport(16,16,sprintf('%s-3D',subName))
+    figExport(8,7,sprintf('%s-3D',subName))
     
     % plot shadow price regions
     figure
     pcolor([0:sz(2)-1],[0:sz(1)-1], sol(subIndex).shadowPrices)
-    xlabel('oxygen uptake rate / mmol.g_{DW}^{-1}.h^{-1}')
-    ylabel(sprintf('%s uptake rate / mmol.g_{DW}^{-1}.h^{-1}',subName))
-    figExport(8,8,sprintf('%s-shadow-price-regions',subName))
+    xlabel('oxygen uptake rate')
+    ylabel(sprintf('%s uptake rate',subName))
+    figExport(6,6,sprintf('%s-shadow-price-regions',subName))
     
     % go through each characteristic point for this substrate
     for charPtIndex = 1:size(charPts{subIndex},1)
