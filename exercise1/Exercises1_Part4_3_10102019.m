@@ -9,6 +9,8 @@ upperFlux = 30;
 % list of substrates to consider
 subs = {'EX_glc(e)'; 'EX_pyr(e)'; 'EX_succ(e)'};
 subsName = {'glucose'; 'pyruvate'; 'succinate';};
+% subs = {'EX_succ(e)'};
+% subsName = {'succinate';};
 
 %% optimisation process
 
@@ -24,11 +26,11 @@ for subIndex = 1:numel(subs)
     
     % change the substrate flux
     for subFlux = 0:upperFlux
-        model = changeRxnBounds(model,sub,-subFlux,'b');
+        model = changeRxnBounds(model,sub,-subFlux,'l');
         
         % change the oxygen flux
         for oxFlux = 0:upperFlux
-            model = changeRxnBounds(model,'EX_o2(e)',-oxFlux,'b');
+            model = changeRxnBounds(model,'EX_o2(e)',-oxFlux,'l');
             
             % do the optimistion
             FBAsolution = optimizeCbModel(model,'max');
@@ -54,7 +56,7 @@ for subIndex = 1:numel(subs)
     end
     
     % now we're done with this substrate, reset its flux to 0
-    model = changeRxnBounds(model,sub,0,'b');
+    model = changeRxnBounds(model,sub,0,'l');
 end
 
 %% create plots
