@@ -56,10 +56,13 @@ end
 
 %% create plots
 
-charPts = [1,3,6,10,20];
-% if (i == 10 & ismember(j,charPts))
-%     writetable(table(model.rxns,FBAsolution.x), ['ptype_glucose_10_' num2str(j) '_flux_data.csv']);
-% end
+% select points (subFlux,oxFlux) to export data for flux profile
+% glucose
+charPts{1} = [10, 1; 10, 3; 10, 6; 10, 10; 10, 20];
+% pyruvate
+charPts{2} = [15, 10; 15, 25];
+% succinate
+charPts{3} = [0, 9; 0, 24];
 
 % go through each substrate
 for subIndex = 1:numel(subs)
@@ -89,4 +92,11 @@ for subIndex = 1:numel(subs)
     ylabel(sprintf('%s uptake rate / mmol.g_{DW}^{-1}.h^{-1}',subName))
     figExport(8,8,sprintf('%s-shadow-price-regions',subName))
     
+    % go through each characteristic point for this substrate
+    for charPtIndex = 1:size(charPts{subIndex},1)
+        charPtFluxes = charPts{subIndex}(charPtIndex,:);
+        
+        % export flux data
+        writetable(table(model.rxns,sol(subIndex).fluxes{charPtFluxes(1)+1,charPtFluxes(2)+1}),  [pwd '/out/' sprintf('%s_sub%s_ox%s_flux_data.csv', subName, num2str(charPtFluxes(1)), num2str(charPtFluxes(2)))] );
+    end
 end
