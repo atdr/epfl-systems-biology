@@ -9,8 +9,6 @@ upperFlux = 30;
 % list of substrates to consider
 subs = {'EX_glc(e)'; 'EX_pyr(e)'; 'EX_succ(e)'};
 subsName = {'glucose'; 'pyruvate'; 'succinate';};
-% subs = {'EX_succ(e)'};
-% subsName = {'succinate';};
 
 %% optimisation process
 
@@ -63,11 +61,11 @@ end
 
 % select points (subFlux,oxFlux) to export data for flux profile
 % glucose
-charPts{1} = [10, 1; 10, 3; 10, 6; 10, 10; 10, 20];
+charPts{1} = [3, 10; 6, 10; 10, 10; 25, 10];
 % pyruvate
-charPts{2} = [15, 10; 15, 25];
+charPts{2} = [25, 6; 25, 9; 25, 20; 15, 20; 5, 20; 5, 6];
 % succinate
-charPts{3} = [0, 9; 0, 24];
+charPts{3} = [25, 20; 15, 20; 5, 20];
 
 % go through each substrate
 for subIndex = 1:numel(subs)
@@ -96,6 +94,10 @@ for subIndex = 1:numel(subs)
     xlabel('oxygen uptake rate')
     ylabel(sprintf('%s uptake rate',subName))
     figExport(6,6,sprintf('%s-shadow-price-regions',subName))
+    
+    % mark characteristic points on map
+    hold on
+    scatter(charPts{subIndex}(:,2),charPts{subIndex}(:,1),'filled','MarkerEdgeColor','k','MarkerFaceColor','m');
     
     % go through each characteristic point for this substrate
     for charPtIndex = 1:size(charPts{subIndex},1)
