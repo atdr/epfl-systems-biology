@@ -16,7 +16,7 @@ subsName = {'glucose'; 'pyruvate'; 'succinate';};
 for subIndex = 1:numel(subs)
     sub = subs{subIndex};
     
-    % initialise array layer
+    % initialise array layer to store output
     sol(subIndex).label = sub;
     sol(subIndex).growthRates = zeros(upperFlux);
     sol(subIndex).shadowPrices = zeros(upperFlux);
@@ -78,7 +78,7 @@ for subIndex = 1:numel(subs)
     plot([0:sz(1)-1], sol(subIndex).growthRates(:,20+1))
     xlabel('uptake rate')
     ylabel('growth yield / h^{-1}')
-    figExport(5,5,sprintf('%s-yield-ox20',subName))
+    % figExport(5,5,sprintf('%s-yield-ox20',subName))
     
     % plot phenotypic phase plane (3D)
     figure
@@ -86,14 +86,14 @@ for subIndex = 1:numel(subs)
     xlabel('oxygen')
     ylabel(subName)
     zlabel('growth yield / h^{-1}')
-    figExport(8,7,sprintf('%s-3D',subName))
+    % figExport(8,7,sprintf('%s-3D',subName))
     
     % plot shadow price regions
     figure
     pcolor([0:sz(2)-1],[0:sz(1)-1], sol(subIndex).shadowPrices)
     xlabel('oxygen uptake rate')
     ylabel(sprintf('%s uptake rate',subName))
-    figExport(6,6,sprintf('%s-shadow-price-regions',subName))
+    % figExport(6,6,sprintf('%s-shadow-price-regions',subName))
     
     % mark characteristic points on map
     hold on
