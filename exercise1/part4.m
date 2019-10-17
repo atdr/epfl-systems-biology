@@ -1,3 +1,5 @@
+%% Exercise 1 - Part 4
+
 clear, clc, close all
 load('ecoli_core_model.mat')
 
@@ -8,7 +10,7 @@ upperFlux = 30;
 
 % list of substrates to consider
 subs = {'EX_glc(e)'; 'EX_pyr(e)'; 'EX_succ(e)'};
-subsName = {'glucose'; 'pyruvate'; 'succinate';};
+subsName = {'glucose'; 'pyruvate'; 'succinate'};
 
 %% optimisation process
 
