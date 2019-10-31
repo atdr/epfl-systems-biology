@@ -1,7 +1,7 @@
 %% Exercise 2 - Part 2
 clear, clc, close all
 
-% change the solver 
+% change the solver
 changeCobraSolver('cplex_direct');
 
 %% Load the model
@@ -16,9 +16,6 @@ tmp = load('thermo_data.mat');
 ReactionDB = tmp.DB_AlbertyUpdate;
 clear tmp
 
-%% Perfom an FBA on the model (optimize for growth)
-FBAsolution = optimizeCbModel(model);
-
 %% prepare model for TFA and convert
 
 prepped_model = prepModelforTFA(model, ReactionDB, model.CompartmentData);
@@ -31,15 +28,15 @@ tmp = convToTFA(prepped_model, ReactionDB, [], 'DGo', [], min_obj);
 % NF_rxn = F_rxn - B_rxn
 this_tmodel = addNetFluxVariables(tmp);
 
-%% Perfom TFA on the model (optimise for growth)
+%% Perfom TFA on the model (without metabolomics data)
 
 % oxygen flux for aerobic or anaerobic conditions
 O2 = [-20 0];
 
-% demand reactions
+% substrate demand reactions
 Rxn = {'DM_glc_e','DM_lac-D_e','DM_ac_e','DM_etoh_e'};
 
-% loop through reactions
+% loop through substrates
 for i = 1:numel(Rxn)
     
     % set carbon source boundary
@@ -69,7 +66,7 @@ if ~isa(mets.StandardDeviation,'double')
     mets.StandardDeviation = str2double(mets.StandardDeviation);
 end
 
-%% adjust model
+%% input metabolomics data
 
 % find the index for each metabolite
 % NB: find_cell silently ignores non-matches; use this function instead
@@ -84,7 +81,7 @@ for met = 1:size(mets,1)
         mets.modelIndexLC(met) = find_cell(strcat('LC_', mets.modelID(met)), this_tmodel.varNames);
     catch
         mets.modelIndexLC(met) = NaN;
-    end  
+    end
 end
 
 % filter metabolites in and not in model
@@ -105,16 +102,19 @@ for met = 1:size(mets,1)
         % total range +/-1 SD around given conc
         mets.C_ub(met) = mets.ConcentrationInMmol(met) + mets.StandardDeviation(met);
         mets.C_lb(met) = mets.ConcentrationInMmol(met) - mets.StandardDeviation(met);
-    end    
+    end
 end
+
+% save model before applying metabolomics data
+tmodel_no_metabolomics = this_tmodel;
 
 % set metabolite concentration bounds
 this_tmodel.var_lb(mets.modelIndexLC) = log(mets.C_lb);
 this_tmodel.var_ub(mets.modelIndexLC) = log(mets.C_ub);
 
-%% Perform TFA for growth with concentration data 
+%% Perform TFA for growth with concentration data
 
-% loop through reactions
+% loop through substrates
 for i = 1:numel(Rxn)
     
     % set carbon source boundary
@@ -133,4 +133,77 @@ for i = 1:numel(Rxn)
     
     % reset carbon source to 0
     this_tmodel = changeTFArxnBounds (this_tmodel, Rxn{i}, 0, 'l');
+end
+
+%% metabolite concentration variability analysis
+
+% with metabolomics data
+metConcLims_with = doMetConcVarAnalysis(this_tmodel, Rxn, O2, YieldTFA_w_con, mets);
+% NB: these are the log bounds that we *imposed*
+% (compare with values from optimisation)
+metConcLims_with_imposed = [log(mets.C_lb) log(mets.C_ub)];
+
+% without metabolomics data
+metConcLims_without = doMetConcVarAnalysis(tmodel_no_metabolomics, Rxn, O2, YieldTFA, mets);
+% NB: these are the log bounds that were originally in the model
+metConcLims_without_existing = [tmodel_no_metabolomics.var_lb(mets.modelIndexLC) tmodel_no_metabolomics.var_ub(mets.modelIndexLC)];
+
+function metConcLims = doMetConcVarAnalysis(this_tmodel, Rxn, O2, Yields, mets)
+% performs metabolite concentration variability analysis
+
+% previous objective variable (where 1 is in this_tmodel.f)
+objVar = 'F_Ec_biomass_iJO1366_WT_53p95M';
+objVarIndex = find_cell(objVar, this_tmodel.varNames);
+
+% remove this objective
+this_tmodel.f(objVarIndex) = 0;
+
+% data output cell
+metConcLims = {};
+
+% loop through reactions
+for i = 1:numel(Rxn)
+    
+    % set carbon source boundary
+    this_tmodel = changeTFArxnBounds(this_tmodel, Rxn{i}, -10, 'l');
+    
+    % aerobic conditions only
+    j = 1;
+    this_tmodel = changeTFArxnBounds(this_tmodel, 'DM_o2_e', O2(j), 'l');
+    
+    % set upper and lower bounds of previous objective variable to
+    % optimum previously found
+    this_tmodel.var_ub(objVarIndex) = Yields(i,j);
+    this_tmodel.var_lb(objVarIndex) = Yields(i,j);
+    
+    % initialise output for metabolite concentrations
+    metConcLims{i,j} = [];
+    
+    % loop through metabolites
+    for k = 1:size(mets,1)
+        %for k = 1:1
+        
+        % set LC of the metabolite as objective
+        this_tmodel.f(mets.modelIndexLC(k)) = 1;
+        
+        % set direction to maximise & solve
+        this_tmodel.objtype = -1;
+        TFAsolution_max = solveTFAmodelCplex(this_tmodel);
+        
+        % set direction to minimise & solve
+        this_tmodel.objtype = +1; % assume opposite of above (?)
+        TFAsolution_min = solveTFAmodelCplex(this_tmodel);
+        
+        % save the results
+        metConcLims{i,j} = [metConcLims{i,j}; TFAsolution_min.x(mets.modelIndexLC(k)) TFAsolution_max.x(mets.modelIndexLC(k))];
+        
+        % now we're done, remove this metabolite as objective
+        this_tmodel.f(mets.modelIndexLC(k)) = 0;
+        
+    end
+    
+    % reset carbon source to 0
+    this_tmodel = changeTFArxnBounds (this_tmodel, Rxn{i}, 0, 'l');
+end
+
 end
