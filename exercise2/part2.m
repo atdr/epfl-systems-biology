@@ -63,8 +63,9 @@ end
 %% load concentration data
 
 mets = readtable('metabolomics_data.csv');
-% SD sometimes interpreted as string (depends on PC) -- convert if needed
-if ischar(mets.StandardDeviation)
+% SD sometimes interpreted as string / cell (depends on MATLAB version)
+% convert if needed
+if ~isa(mets.StandardDeviation,'double')
     mets.StandardDeviation = str2double(mets.StandardDeviation);
 end
 
@@ -73,28 +74,28 @@ end
 % find the index for each metabolite
 % NB: find_cell silently ignores non-matches; use this function instead
 % https://uk.mathworks.com/matlabcentral/answers/142925-matching-texts-in-two-cell-arrays#answer_145977
-%mets.modelIndex = cellfun(@(a) strmatch(a,this_tmodel.varNames),strcat('LC_', mets.modelID),'Uniform',false);
-%mets.modelIndex = cell2mat(mets.modelIndex);
+%mets.modelIndexLC = cellfun(@(a) strmatch(a,this_tmodel.varNames),strcat('LC_', mets.modelID),'Uniform',false);
+%mets.modelIndexLC = cell2mat(mets.modelIndexLC);
 % actually this thing returns cells which are a bit sad
 
-% find the model index
+% find index of LC variable for each metabolite
 for met = 1:size(mets,1)
     try
-        mets.modelIndex(met) = find_cell(strcat('LC_', mets.modelID(met)), this_tmodel.varNames);
+        mets.modelIndexLC(met) = find_cell(strcat('LC_', mets.modelID(met)), this_tmodel.varNames);
     catch
-        mets.modelIndex(met) = NaN;
+        mets.modelIndexLC(met) = NaN;
     end  
 end
 
 % filter metabolites in and not in model
-notmets = mets(isnan(mets.modelIndex),:);
-mets = mets(~isnan(mets.modelIndex),:);
+notmets = mets(isnan(mets.modelIndexLC),:);
+mets = mets(~isnan(mets.modelIndexLC),:);
 
-% save both lists
+% save both lists (just first 2 columns)
 writetable(mets(:,1:2), [pwd '/out/mets.csv']);
 writetable(notmets(:,1:2), [pwd '/out/notmets.csv']);
 
-% calculate upper and lower bounds
+% calculate upper and lower concentration bounds
 for met = 1:size(mets,1)
     if isnan(mets.StandardDeviation(met))
         % when we don't have SD, use 50-150% of conc
@@ -107,11 +108,12 @@ for met = 1:size(mets,1)
     end    
 end
 
-% set bounds
-this_tmodel.var_lb(mets.modelIndex) = log(mets.C_lb);
-this_tmodel.var_ub(mets.modelIndex) = log(mets.C_ub);
+% set metabolite concentration bounds
+this_tmodel.var_lb(mets.modelIndexLC) = log(mets.C_lb);
+this_tmodel.var_ub(mets.modelIndexLC) = log(mets.C_ub);
 
 %% Perform TFA for growth with concentration data 
+
 % loop through reactions
 for i = 1:numel(Rxn)
     
