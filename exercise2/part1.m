@@ -20,13 +20,13 @@ O2 = [-20 0];
 Rxn = {'DM_glc_e','DM_lac-D_e','DM_ac_e','DM_etoh_e'};
 
 % loop through reactions
-for i = 1:4
+for i = 1:numel(Rxn)
     
     % set carbon source boundary
     model = changeRxnBounds(model, Rxn{i}, -10, 'l');
     
     % loop through aerobic/anaerobic conditions
-    for j = 1:2
+    for j = 1:numel(O2)
         
         % set oxygen boundary
         model = changeRxnBounds(model, 'DM_o2_e', O2(j), 'l');
@@ -55,13 +55,13 @@ this_tmodel = addNetFluxVariables(tmp);
 %% perform TFA (optimise for growth)
 
 % loop through reactions
-for i = 1:4
+for i = 1:numel(Rxn)
     
     % set carbon source boundary
     this_tmodel = changeTFArxnBounds(this_tmodel, Rxn{i}, -10, 'l');
     
     % loop through aerobic/anaerobic conditions
-    for j = 1:2
+    for j = 1:numel(O2)
         
         % set oxygen boundary
         this_tmodel = changeTFArxnBounds(this_tmodel, 'DM_o2_e', O2(j), 'l');
