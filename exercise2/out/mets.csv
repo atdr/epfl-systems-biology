@@ -1,0 +1,60 @@
+modelID,Metabolite
+akg_c,2-Oxoglutarate
+3pg_c,3-Phosphoglycerate
+adp_c,ADP
+ala-L_c,Ala
+arg-L_c,Arg
+asn-L_c,Asn
+asp-L_c,Asp
+atp_c,ATP
+spmd_c,Castanospermine
+ctp_c,CTP
+datp_c,dATP
+dctp_c,dCTP
+dhap_c,Dihydroxyacetone phosphate
+fdp_c,Fructose 1.6-diphosphate
+f6p_c,Fructose 6-phosphate
+fum_c,Fumarate
+g1p_c,Glucose 1-phosphate
+g6p_c,Glucose 6-phosphate
+glu-L_c,Glutamate
+gthrd_c,Glutathione
+gly_c,Gly
+his-L_c,His
+ile-L_c,Ile
+leu-L_c,Leu
+lys-L_c,Lys
+mal-L_c,Malate
+met-L_c,Met
+nad_c,NAD
+nadp_c,NADP
+nadph_c,NADPH
+phe-L_c,Phe
+pro-L_c,Pro
+pyr_c,Pyruvate
+r5p_c,Ribose 5-phosphate
+ru5p-D_c,Ribulose 5-phosphate
+amet_c,S-Adenosylmethionine
+s7p_c,Sedoheptulose-7-phosphate
+ser-L_c,Ser
+succ_c,Succinate
+thmpp_c,TDP
+thr-L_c,Thr
+trp-L_c,Trp
+tyr-L_c,Tyr
+udcpdp_c,UDP
+utp_c,UTP
+val-L_c,Val
+glc-D_e,Glucose
+etoh_e,Ethanol
+ac_e,Acetate
+lac-D_e,L-Lactate
+succ_e,Succinate
+pyr_e,Pyruvate
+dttp_c,dCTP
+fad_c,FAD
+gln-L_c,Gln
+gtp_c,GTP
+pep_c,Phosphoenolpyruvate
+ptrc_c,1.4-Butanediamine
+pydx5p_c,Pyridoxal 5-phosphate

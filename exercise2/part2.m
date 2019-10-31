@@ -19,10 +19,10 @@ clear tmp
 %% Perfom an FBA on the model (optimize for growth)
 FBAsolution = optimizeCbModel(model);
 
-%% Prepare the model for TFA
+%% prepare model for TFA and convert
+
 prepped_model = prepModelforTFA(model, ReactionDB, model.CompartmentData);
 
-%% Convert to TFA
 min_obj = 0.0;
 tmp = convToTFA(prepped_model, ReactionDB, [], 'DGo', [], min_obj);
 
@@ -33,16 +33,31 @@ this_tmodel = addNetFluxVariables(tmp);
 
 %% Perfom TFA on the model (optimise for growth)
 
-O2 = [-20 0]; %aerobic or anaerobic reaction
-Rxn = {'DM_glc_e','DM_lac-D_e','DM_ac_e','DM_etoh_e'};%vector of exchange reactions
-for i = 1:4 %loop for 4 exchange reactions
-    this_tmodel = changeTFArxnBounds (this_tmodel, Rxn{i}, -10, 'l'); %boundary setting for carbon source of interest
-    for j = 1:2 %loop for aerobic/anaerobic reactions
-        this_tmodel = changeTFArxnBounds (this_tmodel, 'DM_o2_e', O2(j), 'l'); %boudary setting for aerobic/anaerobic reaction
+% oxygen flux for aerobic or anaerobic conditions
+O2 = [-20 0];
+
+% demand reactions
+Rxn = {'DM_glc_e','DM_lac-D_e','DM_ac_e','DM_etoh_e'};
+
+% loop through reactions
+for i = 1:numel(Rxn)
+    
+    % set carbon source boundary
+    this_tmodel = changeTFArxnBounds(this_tmodel, Rxn{i}, -10, 'l');
+    
+    % loop through aerobic/anaerobic conditions
+    for j = 1:numel(O2)
+        
+        % set oxygen boundary
+        this_tmodel = changeTFArxnBounds(this_tmodel, 'DM_o2_e', O2(j), 'l');
+        
+        % do TFA solution and save result
         TFAsolution = solveTFAmodelCplex(this_tmodel);
-        YieldTFA (i,j) = TFAsolution.val;
+        YieldTFA(i,j) = TFAsolution.val;
     end
-    this_tmodel = changeTFArxnBounds (this_tmodel, Rxn{i}, 0, 'l');%reinitialise boundary setting of carbon source
+    
+    % reset carbon source to 0
+    this_tmodel = changeTFArxnBounds (this_tmodel, Rxn{i}, 0, 'l');
 end
 
 %% load concentration data
@@ -97,15 +112,23 @@ this_tmodel.var_lb(mets.modelIndex) = log(mets.C_lb);
 this_tmodel.var_ub(mets.modelIndex) = log(mets.C_ub);
 
 %% Perform TFA for growth with concentration data 
-
-O2 = [-20 0]; %aerobic or anaerobic reaction
-Rxn = {'DM_glc_e','DM_lac-D_e','DM_ac_e','DM_etoh_e'};%vector of exchange reactions
-for i = 1:4 %loop for 4 exchange reactions
-    this_tmodel = changeTFArxnBounds (this_tmodel, Rxn{i}, -10, 'l'); %boundary setting for carbon source of interest
-    for j = 1:2 %loop for aerobic/anaerobic reactions
-        this_tmodel = changeTFArxnBounds (this_tmodel, 'DM_o2_e', O2(j), 'l'); %boudary setting for aerobic/anaerobic reaction
+% loop through reactions
+for i = 1:numel(Rxn)
+    
+    % set carbon source boundary
+    this_tmodel = changeTFArxnBounds(this_tmodel, Rxn{i}, -10, 'l');
+    
+    % loop through aerobic/anaerobic conditions
+    for j = 1:numel(O2)
+        
+        % set oxygen boundary
+        this_tmodel = changeTFArxnBounds(this_tmodel, 'DM_o2_e', O2(j), 'l');
+        
+        % do TFA solution and save result
         TFAsolution_w_con = solveTFAmodelCplex(this_tmodel);
-        YieldTFA_w_con (i,j) = TFAsolution_w_con.val;
+        YieldTFA_w_con(i,j) = TFAsolution_w_con.val;
     end
-    this_tmodel = changeTFArxnBounds (this_tmodel, Rxn{i}, 0, 'l');%reinitialise boundary setting of carbon source
+    
+    % reset carbon source to 0
+    this_tmodel = changeTFArxnBounds (this_tmodel, Rxn{i}, 0, 'l');
 end
