@@ -1,1 +1,74 @@
-model ID;Metabolite;Concentration in mmol;Standard deviationakg_c;2-Oxoglutarate;3.01E-02;3pg_c;3-Phosphoglycerate;5.06E-01;1.90E-01ade_c;Adenine;1.58E-01;6.46E-02adn_c;Adenosine;8.37E-02;3.29E-02adp_c;ADP;5.62E-01;2.55E-01adpgc;ADP-glucose;1.27E-02;5.58E-03ala-L_c;Ala;3.20E-01;1.85E-01alaala_c;Ala-Ala;5.55E-01;1.42E-01arg-L_c;Arg;5.69E-02;2.15E-02asn-L_c;Asn;1.12E-01;5.89E-02asp-L_c;Asp;3.29E-01;1.46E-01atp_c;ATP;1.23E+00;6.09E-01crn-D_c;Carnitine;2.84E-03;1.63E-03spmd_c;Castanospermine;6.21E-03;ctp_c;CTP;2.59E-01;1.17E-01cytd_c;Cytidine;6.24E-03;2.99E-03datp_c;dADP;3.52E-02;2.05E-02datp_c;dATP;4.03E-02;2.84E-02dctp_c;dCTP;2.54E-02;1.23E-02dhap_c;Dihydroxyacetone phosphate;1.26E-01;fdp_c;Fructose 1.6-diphosphate;2.59E-02;7.44E-03f6p_c;Fructose 6-phosphate;4.39E-02;1.21E-02fum_c;Fumarate;5.71E-02;2.22E-02g1p_c;Glucose 1-phosphate;6.36E-02;5.17E-02g6p_c;Glucose 6-phosphate;1.81E-01;4.23E-02glu-L_c;Glutamate;3.47E+00;5.00E-01gthrd_c;Glutathione;7.91E+00;5.11E+00gly_c;Gly;2.90E-01;1.83E-01gua_c;Guanine;5.86E-02;1.75E-02his-L_c;His;7.85E-02;5.92E-02ile-L_c;Ile;3.32E-02;ins_c;Inosine;3.42E-02;1.21E-02leu-L_c;Leu;1.14E-01;9.04E-03lys-L_c;Lys;3.35E-01;8.16E-02mal-L_c;Malate;6.87E-02;2.06E-02met-L_c;Met;3.18E-02;6.82E-03nad_c;NAD;7.20E-01;3.77E-01nadp_c;NADP;8.73E-02;4.14E-02nadph_c;NADPH;1.63E-01;orn_c;Ornithine;9.72E-02;1.75E-02phe-L_c;Phe;5.63E-02;5.48E-03pro-L_c;Pro;9.42E-02;3.41E-02pyr_c;Pyruvate;1.28E-01;r5p_c;Ribose 5-phosphate;3.62E-02;2.94E-02ru5p-D_c;Ribulose 5-phosphate;1.28E-01;7.22E-02amet_c;S-Adenosylmethionine;1.30E-01;6.96E-02s7p_c;Sedoheptulose-7-phosphate;2.22E-01;6.46E-02ser-L_c;Ser;3.09E-01;2.10E-01succ_c;Succinate;6.95E-02;8.10E-03thmpp_c;TDP;5.85E-01;6.53E-01thr-L_c;Thr;1.48E-01;8.23E-02trp-L_c;Trp;1.07E-02;1.90E-03tyr-L_c;Tyr;3.45E-02;8.61E-03udcpdp_c;UDP;9.53E-01;8.80E-01uaagmda_c;UDP-N-acetylglucosamine;3.23E-01;2.36E-01utp_c;UTP;6.36E-01;3.00E-01val-L_c;Val;2.01E-01;1.69E-02glc-D_e;Glucose;8.85E-03;4.29E-03etoh_e;Ethanol;1.25E-02;1.28E-02ac_e;Acetate;2.63E-03;2.91E-03lac-D_e;L-Lactate;1.20E-03;1.20E-03succ_e;Succinate;9.87E-03;1.22E-02pyr_e;Pyruvate;1.71E-03;1.42E-034abut_c;GABA;0.046005206;0.016142356cgly_c;Cys-Gly;0.020464931;dttp_c;dCTP;0.025375612;0.012332206fad_c;FAD;0.026680487;0.013129868gln-L_c;Gln;0.641449567;0.387911876gtp_c;GTP;0.627229356;0.306649496pep_c;Phosphoenolpyruvate;1.20E-01;4.72E-02ptrc_c;1.4-Butanediamine;0.113580165;0.033970642pydx5p_c;Pyridoxal 5-phosphate;2.44E-01;
+model ID;Metabolite;Concentration in mmol;Standard deviation
+akg_c;2-Oxoglutarate;3.01E-02;
+3pg_c;3-Phosphoglycerate;5.06E-01;1.90E-01
+ade_c;Adenine;1.58E-01;6.46E-02
+adn_c;Adenosine;8.37E-02;3.29E-02
+adp_c;ADP;5.62E-01;2.55E-01
+adpgc;ADP-glucose;1.27E-02;5.58E-03
+ala-L_c;Ala;3.20E-01;1.85E-01
+alaala_c;Ala-Ala;5.55E-01;1.42E-01
+arg-L_c;Arg;5.69E-02;2.15E-02
+asn-L_c;Asn;1.12E-01;5.89E-02
+asp-L_c;Asp;3.29E-01;1.46E-01
+atp_c;ATP;1.23E+00;6.09E-01
+crn-D_c;Carnitine;2.84E-03;1.63E-03
+spmd_c;Castanospermine;6.21E-03;
+ctp_c;CTP;2.59E-01;1.17E-01
+cytd_c;Cytidine;6.24E-03;2.99E-03
+dadp_c;dADP;3.52E-02;2.05E-02
+datp_c;dATP;4.03E-02;2.84E-02
+dctp_c;dCTP;2.54E-02;1.23E-02
+dhap_c;Dihydroxyacetone phosphate;1.26E-01;
+fdp_c;Fructose 1.6-diphosphate;2.59E-02;7.44E-03
+f6p_c;Fructose 6-phosphate;4.39E-02;1.21E-02
+fum_c;Fumarate;5.71E-02;2.22E-02
+g1p_c;Glucose 1-phosphate;6.36E-02;5.17E-02
+g6p_c;Glucose 6-phosphate;1.81E-01;4.23E-02
+glu-L_c;Glutamate;3.47E+00;5.00E-01
+gthrd_c;Glutathione;7.91E+00;5.11E+00
+gly_c;Gly;2.90E-01;1.83E-01
+gua_c;Guanine;5.86E-02;1.75E-02
+his-L_c;His;7.85E-02;5.92E-02
+ile-L_c;Ile;3.32E-02;
+ins_c;Inosine;3.42E-02;1.21E-02
+leu-L_c;Leu;1.14E-01;9.04E-03
+lys-L_c;Lys;3.35E-01;8.16E-02
+mal-L_c;Malate;6.87E-02;2.06E-02
+met-L_c;Met;3.18E-02;6.82E-03
+nad_c;NAD;7.20E-01;3.77E-01
+nadp_c;NADP;8.73E-02;4.14E-02
+nadph_c;NADPH;1.63E-01;
+orn_c;Ornithine;9.72E-02;1.75E-02
+phe-L_c;Phe;5.63E-02;5.48E-03
+pro-L_c;Pro;9.42E-02;3.41E-02
+pyr_c;Pyruvate;1.28E-01;
+r5p_c;Ribose 5-phosphate;3.62E-02;2.94E-02
+ru5p-D_c;Ribulose 5-phosphate;1.28E-01;7.22E-02
+amet_c;S-Adenosylmethionine;1.30E-01;6.96E-02
+s7p_c;Sedoheptulose-7-phosphate;2.22E-01;6.46E-02
+ser-L_c;Ser;3.09E-01;2.10E-01
+succ_c;Succinate;6.95E-02;8.10E-03
+thmpp_c;TDP;5.85E-01;6.53E-01
+thr-L_c;Thr;1.48E-01;8.23E-02
+trp-L_c;Trp;1.07E-02;1.90E-03
+tyr-L_c;Tyr;3.45E-02;8.61E-03
+udcpdp_c;UDP;9.53E-01;8.80E-01
+uaagmda_c;UDP-N-acetylglucosamine;3.23E-01;2.36E-01
+utp_c;UTP;6.36E-01;3.00E-01
+val-L_c;Val;2.01E-01;1.69E-02
+glc-D_e;Glucose;8.85E-03;4.29E-03
+etoh_e;Ethanol;1.25E-02;1.28E-02
+ac_e;Acetate;2.63E-03;2.91E-03
+lac-D_e;L-Lactate;1.20E-03;1.20E-03
+succ_e;Succinate;9.87E-03;1.22E-02
+pyr_e;Pyruvate;1.71E-03;1.42E-03
+4abut_c;GABA;0.046005206;0.016142356
+cgly_c;Cys-Gly;0.020464931;
+dttp_c;dCTP;0.025375612;0.012332206
+fad_c;FAD;0.026680487;0.013129868
+gln-L_c;Gln;0.641449567;0.387911876
+gtp_c;GTP;0.627229356;0.306649496
+pep_c;Phosphoenolpyruvate;1.20E-01;4.72E-02
+ptrc_c;1.4-Butanediamine;0.113580165;0.033970642
+pydx5p_c;Pyridoxal 5-phosphate;2.44E-01;
+

@@ -1,15 +1,21 @@
-clc
-addpath(genpath('C:\AAA\EPFL Y3\Principles and Application of Systems biology\MATLAB\matTFA-master'));
-addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio129\cplex\matlab'))
+%% Exercise 2 - Part 2
+clear, clc, close all
+
+% change the solver 
 changeCobraSolver('cplex_direct');
+
 %% Load the model
+% matTFA contains both a smallEcoli.mat and small_ecoli.mat model
+% here we're explicitly using small_ecoli.mat from Moodle
 tmp = load('small_ecoli.mat');
 model = tmp.model_red;
 clear tmp
+
 %% Load the thermodynamics database
 tmp = load('thermo_data.mat');
 ReactionDB = tmp.DB_AlbertyUpdate;
 clear tmp
+
 %% Perfom an FBA on the model (optimize for growth)
 FBAsolution = optimizeCbModel(model);
 
@@ -26,6 +32,7 @@ tmp = convToTFA(prepped_model, ReactionDB, [], 'DGo', [], min_obj);
 this_tmodel = addNetFluxVariables(tmp);
 
 %% Perfom TFA on the model (optimise for growth)
+
 O2 = [-20 0]; %aerobic or anaerobic reaction
 Rxn = {'DM_glc_e','DM_lac-D_e','DM_ac_e','DM_etoh_e'};%vector of exchange reactions
 for i = 1:4 %loop for 4 exchange reactions
@@ -37,10 +44,24 @@ for i = 1:4 %loop for 4 exchange reactions
     end
     this_tmodel = changeTFArxnBounds (this_tmodel, Rxn{i}, 0, 'l');%reinitialise boundary setting of carbon source
 end
+
 %% load concentration data
+
 mets = readtable('metabolomics_data.csv');
+% SD sometimes interpreted as string (depends on PC) -- convert if needed
+if ischar(mets.StandardDeviation)
+    mets.StandardDeviation = str2double(mets.StandardDeviation);
+end
 
 %% adjust model
+
+% find the index for each metabolite
+% NB: find_cell silently ignores non-matches; use this function instead
+% https://uk.mathworks.com/matlabcentral/answers/142925-matching-texts-in-two-cell-arrays#answer_145977
+%mets.modelIndex = cellfun(@(a) strmatch(a,this_tmodel.varNames),strcat('LC_', mets.modelID),'Uniform',false);
+%mets.modelIndex = cell2mat(mets.modelIndex);
+% actually this thing returns cells which are a bit sad
+
 % find the model index
 for met = 1:size(mets,1)
     try
@@ -50,8 +71,13 @@ for met = 1:size(mets,1)
     end  
 end
 
-% filter out metabolites not in model
+% filter metabolites in and not in model
+notmets = mets(isnan(mets.modelIndex),:);
 mets = mets(~isnan(mets.modelIndex),:);
+
+% save both lists
+writetable(mets(:,1:2), [pwd '/out/mets.csv']);
+writetable(notmets(:,1:2), [pwd '/out/notmets.csv']);
 
 % calculate upper and lower bounds
 for met = 1:size(mets,1)
@@ -60,7 +86,7 @@ for met = 1:size(mets,1)
         mets.C_ub(met) = 1.5 * mets.ConcentrationInMmol(met);
         mets.C_lb(met) = 0.5 * mets.ConcentrationInMmol(met);
     else
-        % total range 1 SD around given conc
+        % total range +/-1 SD around given conc
         mets.C_ub(met) = mets.ConcentrationInMmol(met) + mets.StandardDeviation(met);
         mets.C_lb(met) = mets.ConcentrationInMmol(met) - mets.StandardDeviation(met);
     end    
@@ -71,6 +97,7 @@ this_tmodel.var_lb(mets.modelIndex) = log(mets.C_lb);
 this_tmodel.var_ub(mets.modelIndex) = log(mets.C_ub);
 
 %% Perform TFA for growth with concentration data 
+
 O2 = [-20 0]; %aerobic or anaerobic reaction
 Rxn = {'DM_glc_e','DM_lac-D_e','DM_ac_e','DM_etoh_e'};%vector of exchange reactions
 for i = 1:4 %loop for 4 exchange reactions
