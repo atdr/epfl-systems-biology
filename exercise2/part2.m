@@ -148,6 +148,21 @@ metConcLims_without = doMetConcVarAnalysis(tmodel_no_metabolomics, Rxn, O2, Yiel
 % NB: these are the log bounds that were originally in the model
 metConcLims_without_existing = [tmodel_no_metabolomics.var_lb(mets.modelIndexLC) tmodel_no_metabolomics.var_ub(mets.modelIndexLC)];
 
+% find ranges with and without metabolomics data
+for c = 1:numel(metConcLims_with)
+    metConcLims_with_without_ranges{c,1} = [...
+        % column 1
+        metConcLims_with{c,1}(:,2)-metConcLims_with{c,1}(:,1),...
+        % column 2
+        metConcLims_without{c,1}(:,2)-metConcLims_without{c,1}(:,1)];
+    
+    % export for Escher
+    writetable(table(mets.modelID,metConcLims_with_without_ranges{c,1}), [pwd '/out/metConcLims_with_without_ranges_' Rxn{c} '.csv']);
+end
+
+
+%% function space
+
 function metConcLims = doMetConcVarAnalysis(this_tmodel, Rxn, O2, Yields, mets)
 % performs metabolite concentration variability analysis
 
