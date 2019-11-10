@@ -141,25 +141,32 @@ end
 metConcLims_with = doMetConcVarAnalysis(this_tmodel, Rxn, O2, YieldTFA_w_con, mets);
 % NB: these are the log bounds that we *imposed*
 % (compare with values from optimisation)
-metConcLims_with_imposed = [log(mets.C_lb) log(mets.C_ub)];
+metConcLims_with_imposed = real([log(mets.C_lb) log(mets.C_ub)]); % use real() since log(0) = -Inf + 0i according to Matlab
 
 % without metabolomics data
 metConcLims_without = doMetConcVarAnalysis(tmodel_no_metabolomics, Rxn, O2, YieldTFA, mets);
 % NB: these are the log bounds that were originally in the model
-metConcLims_without_existing = [tmodel_no_metabolomics.var_lb(mets.modelIndexLC) tmodel_no_metabolomics.var_ub(mets.modelIndexLC)];
+metConcLims_without_imposed = [tmodel_no_metabolomics.var_lb(mets.modelIndexLC) tmodel_no_metabolomics.var_ub(mets.modelIndexLC)];
+
+%% analyse data
 
 % find ranges with and without metabolomics data
-for c = 1:numel(metConcLims_with)
-    metConcLims_with_without_ranges{c,1} = [...
-        % column 1
-        metConcLims_with{c,1}(:,2)-metConcLims_with{c,1}(:,1),...
-        % column 2
+for c = 1:numel(Rxn)
+    metConcLims_with_without_ranges{c,1} = [metConcLims_with{c,1}(:,2)-metConcLims_with{c,1}(:,1),...
         metConcLims_without{c,1}(:,2)-metConcLims_without{c,1}(:,1)];
     
     % export for Escher
     writetable(table(mets.modelID,metConcLims_with_without_ranges{c,1}), [pwd '/out/metConcLims_with_without_ranges_' Rxn{c} '.csv']);
 end
 
+% calculate difference between limits and bounds
+for c = 1:numel(Rxn)
+    metConcLims_with_change{c,1} = metConcLims_with{c,1} - metConcLims_with_imposed;
+    metConcLims_without_change{c,1} = metConcLims_without{c,1} - metConcLims_without_imposed;
+    
+    % export table
+    writetable(table(mets.modelID,metConcLims_with_change{c,1},metConcLims_without_change{c,1}), [pwd '/out/metConcLims_change_' Rxn{c} '.csv']);
+end
 
 %% function space
 
@@ -198,15 +205,14 @@ for i = 1:numel(Rxn)
     for k = 1:size(mets,1)
         %for k = 1:1
         
-        % set LC of the metabolite as objective
+        % set objective to maximise LC of the metabolite
         this_tmodel.f(mets.modelIndexLC(k)) = 1;
-        
-        % set direction to maximise & solve
-        this_tmodel.objtype = -1;
+        % solve
         TFAsolution_max = solveTFAmodelCplex(this_tmodel);
         
-        % set direction to minimise & solve
-        this_tmodel.objtype = +1; % assume opposite of above (?)
+        % set objective to minimise LC of the metabolite
+        this_tmodel.f(mets.modelIndexLC(k)) = -1;
+        % solve
         TFAsolution_min = solveTFAmodelCplex(this_tmodel);
         
         % save the results
