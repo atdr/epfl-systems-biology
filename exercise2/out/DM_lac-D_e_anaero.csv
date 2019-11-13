@@ -30,7 +30,7 @@ DM_etoh_e,0
 DM_fe2_e,0
 DM_fe3_e,0
 DM_for_e,0
-DM_glc_e,-1
+DM_glc_e,0
 DM_glcn_e,0
 DM_glu-L_e,0
 DM_gly_e,0
@@ -96,7 +96,7 @@ ASNt2rpp,0
 ASNtex,0
 ASPO3,0
 ASPO4,0
-ASPO5,1
+ASPO5,0
 ASPO6,0
 ASPT,0
 ASPTA,0
@@ -140,7 +140,7 @@ DHORD5,0
 DHORDfum,0
 EDA,0
 EDD,0
-ENO,1
+ENO,0
 ETOHtex,0
 ETOHtrpp,0
 F6PA,0
@@ -169,14 +169,14 @@ G3PD7,0
 G3PT,0
 G6PDH2r,0
 G6PP,0
-GAPD,1
+GAPD,0
 GLBRAN2,0
 GLCDpp,0
 GLCNtex,0
 GLCP,0
 GLCS1,0
 GLCabcpp,0
-GLCptspp,1
+GLCptspp,0
 GLCt2pp,0
 GLCtex,0
 GLCtexi,0
@@ -202,7 +202,7 @@ GLYCTO3,0
 GLYCTO4,0
 GLYCtex,0
 GLYCtpp,0
-GLYK,1
+GLYK,0
 GLYt2rpp,0
 GLYtex,0
 GND,0
@@ -269,7 +269,7 @@ NI2uabcpp,0
 NTP1,0
 NTPP6,0
 O2tex,0
-O2tpp,-1
+O2tpp,0
 OAADC,0
 PDH,0
 PE160abcpp,0
@@ -281,10 +281,10 @@ PFL,0
 PG160abcpp,0
 PG161abcpp,0
 PG181abcpp,0
-PGI,1
-PGK,-1
+PGI,0
+PGK,0
 PGL,0
-PGM,-1
+PGM,0
 PGMT,0
 PHEMEabcpp,0
 PHEMEtiex,0
@@ -333,7 +333,7 @@ THRt2rpp,0
 THRtex,0
 TKT1,0
 TKT2,0
-TPI,1
+TPI,0
 TRDR,0
 TRPt2rpp,0
 TRPtex,0
@@ -467,7 +467,7 @@ LMPD_120_gtp_c,0
 LMPD_121_gtp_c,0
 LMPD_122_gtp_c,0
 LMPD_123_gtp_c,0
-LMPD_124_hemeO_c,1
+LMPD_124_hemeO_c,0
 LMPD_125_hemeO_c,0
 LMPD_126_his-L_c,0
 LMPD_127_his-L_c,0
@@ -566,7 +566,7 @@ LMPD_219_pheme_c,0
 LMPD_220_pro-L_c,0
 LMPD_221_ptrc_c,0
 LMPD_222_pydx5p_c,0
-LMPD_223_pydx5p_c,1
+LMPD_223_pydx5p_c,0
 LMPD_224_q8h2_c,0
 LMPD_225_q8h2_c,0
 LMPD_226_q8h2_c,0

@@ -31,7 +31,7 @@ DM_fe2_e,0
 DM_fe3_e,0
 DM_for_e,0
 DM_glc_e,0
-DM_glcn_e,0
+DM_glcn_e,1
 DM_glu-L_e,0
 DM_gly_e,0
 DM_glyc_e,0
@@ -172,7 +172,7 @@ G6PP,0
 GAPD,0
 GLBRAN2,0
 GLCDpp,0
-GLCNtex,0
+GLCNtex,-1
 GLCP,0
 GLCS1,0
 GLCabcpp,0
@@ -387,10 +387,10 @@ LMPD_39_btn_c,0
 LMPD_40_btn_c,0
 LMPD_41_btn_c,0
 LMPD_42_btn_c,0
-LMPD_43_btn_c,0
-LMPD_44_btn_c,0
-LMPD_45_btn_c,0
-LMPD_47_btn_c,0
+LMPD_43_btn_c,-1
+LMPD_44_btn_c,-1
+LMPD_45_btn_c,-1
+LMPD_47_btn_c,-1
 LMPD_48_ca2_c,0
 LMPD_49_ca2_c,0
 LMPD_50_ca2_c,0

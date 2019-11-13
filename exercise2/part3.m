@@ -96,6 +96,9 @@ clear tmp
 Fluxmin_TFA = NaN(end_i, end_j, end_k);
 Fluxmax_TFA = NaN(end_i, end_j, end_k);
 
+% remove glucose from TFA_model
+TFA_model = changeTFArxnBounds(TFA_model, 'DM_glc_e', 0, 'l');
+
 % grab environment to pass to parallel workers
 environment = getEnvironment();
 
@@ -109,9 +112,7 @@ parfor i = 1:end_i
     model2 = TFA_model;
     
     % set the flux of ONE SUBSTRATE AT A TIME
-    fluxes = zeros(1,4);
-    fluxes(i) = -10;
-    model2 = changeRxnBounds (model2, Rxn, fluxes, 'l');
+    model2 = changeTFArxnBounds(model2, Rxn{i}, -10, 'l');
     
     for j = 1:end_j
         
@@ -132,25 +133,29 @@ parfor i = 1:end_i
             % Change the objective rxn biomass to 0
             model3.f (objVarIndex) = 0;
             
-            % Flux analysis
-            for k = 1:end_k
-                k_ = k+3478; % index of NF variable
-                
-                % Change the objective rxn to 1
-                model3.f(k_) = 1;
-                
-                % Set direction to minimise & solve
-                model3.objtype = +1;
-                TFAsolutionmin = solveTFAmodelCplex(model3);
-                Fluxmin_TFA(i, j, k) = TFAsolutionmin.val;
-                
-                % Set direction to maximise & solve
-                model3.objtype = -1;
-                TFAsolutionmax = solveTFAmodelCplex(model3);
-                Fluxmax_TFA(i, j, k) = TFAsolutionmax.val;
-                
-                % Change the objective rxn to 0
-                model3.f(k_) = 0;
+            try
+                % Flux analysis
+                for k = 1:end_k
+                    k_ = k+3478; % index of NF variable
+                    
+                    % Change the objective rxn to 1
+                    model3.f(k_) = 1;
+                    
+                    % Set direction to minimise & solve
+                    model3.objtype = +1;
+                    TFAsolutionmin = solveTFAmodelCplex(model3);
+                    Fluxmin_TFA(i, j, k) = TFAsolutionmin.val;
+                    
+                    % Set direction to maximise & solve
+                    model3.objtype = -1;
+                    TFAsolutionmax = solveTFAmodelCplex(model3);
+                    Fluxmax_TFA(i, j, k) = TFAsolutionmax.val;
+                    
+                    % Change the objective rxn to 0
+                    model3.f(k_) = 0;
+                end
+            catch
+                fprintf('Failed TFA flux analysis for:\t%s\t%s\t%s\n',Rxn{i},O2_label{j},model3.rxns{k});
             end
             
         catch
