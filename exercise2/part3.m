@@ -1,5 +1,8 @@
-clear all
-% Change the solver 
+%% Exercise 2 - Part 3
+clear, clc, close all
+% requires the Parallel Computing Toolbox (!)
+
+% change the solver
 changeCobraSolver('cplex_direct');
 
 %% Load the model
@@ -10,23 +13,30 @@ clear tmp
 %% Data for the Flux Analysis
 
 O2 = [-20 0];
+O2_label = {'aero', 'anaero'};
 Rxn = {'DM_glc_e','DM_lac-D_e','DM_ac_e','DM_etoh_e' };
 
 %% FBA Flux Analysis
 
-% Copy the model
-model1 = model;
-
 % Save the flux data
-Fluxmin_FBA = NaN (length(Rxn), length (O2), length(model1.rxns));
-Fluxmax_FBA = NaN (length(Rxn), length (O2), length(model1.rxns));
+Fluxmin_FBA = NaN (length(Rxn), length (O2), length(model.rxns));
+Fluxmax_FBA = NaN (length(Rxn), length (O2), length(model.rxns));
 
-for i = 1:length(Rxn)
+% pre-calculate length of for loops
+end_i = length(Rxn);
+end_j = length(O2);
+end_k = length(model.rxns);
+
+parfor i = 1:end_i
+    
+    % copy model & set up solver for each parallel worker
+    model1 = model;
+    changeCobraSolver('cplex_direct');
     
     % Set the substrate flux
     model1 = changeRxnBounds (model1, Rxn(i), -10, 'l');
     
-    for j = 1:length(O2)
+    for j = 1:end_j
         
         % Set the O2 flux
         model1 = changeRxnBounds (model1, 'DM_o2_e', O2(j), 'l');
@@ -36,7 +46,7 @@ for i = 1:length(Rxn)
         model1 = changeRxnBounds (model1, 'Ec_biomass_iJO1366_WT_53p95M', FBAsolution.f, 'b');
         
         % Flux analysis
-        for k = 1:length(model1.rxns)
+        for k = 1:end_k
             
             % Set the objective reaction
             model1 = changeObjective (model1, model1.rxns (k));
@@ -46,13 +56,16 @@ for i = 1:length(Rxn)
             Fluxmin_FBA (i, j, k) = FBAsolutionmin.f;
             FBAsolutionmax = optimizeCbModel (model1, 'max');
             Fluxmax_FBA (i, j, k) = FBAsolutionmax.f;
+
         end
+        
+        % print an update
+        fprintf('Finished FBA flux analysis for:\t%s\t%s\n',Rxn{i},O2_label{j});
     end
     
     model1 = changeRxnBounds (model1, Rxn(i), 0, 'l');
 
 end
-
 
 %% Load the thermodynamics database
 
@@ -70,19 +83,20 @@ clear tmp
 
 %% TFA Flux Analysis
 
-% Copy model
-model2 = TFA_model;
-
 % Save the flux data
 Fluxmin_TFA = NaN (length(Rxn), length (O2), 599);
 Fluxmax_TFA = NaN (length(Rxn), length (O2), 599);
 
-for i = 1:length(Rxn)
+parfor i = 1:end_i
+    
+    % copy model & set up solver for each parallel worker
+    model2 = TFA_model;
+    changeCobraSolver('cplex_direct');
     
     % Set the substrate flux to -10
     model2 = changeTFArxnBounds (model2, Rxn(i), -10, 'l');
     
-    for j = 1:length(O2)
+    for j = 1:end_j
         
         % Set the O2 flux
         model3 = changeTFArxnBounds (model2, 'DM_o2_e', O2(j), 'l');
@@ -93,42 +107,46 @@ for i = 1:length(Rxn)
         model3.f(objVarIndex) = 1;
         
         % Determine the maximum biomass production and set it as constant
-        try
-            TFAsolution = solveTFAmodelCplex (model3);
-            model3 = changeTFArxnBounds (model3, 'Ec_biomass_iJO1366_WT_53p95M', TFAsolution.val, 'b');
+        TFAsolution = solveTFAmodelCplex (model3);
+        model3 = changeTFArxnBounds (model3, 'Ec_biomass_iJO1366_WT_53p95M', TFAsolution.val, 'b');
+        
+        % Change the objective rxn biomass to 0
+        model3.f (objVarIndex) = 0;
+        
+        % Flux analysis
+        for k = 1:end_k
+            k_ = k+3478;
             
-            % Change the objective rxn biomass to 0
-            model3.f (objVarIndex) = 0;
+            % Change the objective rxn to 1
+            % model3.f (k_) = 1;
             
-            % Flux analysis
-            for k = 3479:4077
-                
-                % Change the objective rxn to 1
-                model3.f (k) = 1;
-                
+            try
                 % Set direction to minimise & solve
-                model3.objtype = 1;
+                model3.f (k_) = -1;
                 TFAsolutionmin = solveTFAmodelCplex(model3);
-                Fluxmin_TFA (i, j, (k-3478)) = TFAsolutionmin.val;
+                Fluxmin_TFA (i, j, k) = -TFAsolutionmin.val;
                 
                 % Set direction to maximise & solve
-                model3.objtype = -1;
+                model3.f (k) = 1;
                 TFAsolutionmax = solveTFAmodelCplex(model3);
-                Fluxmax_TFA (i, j, (k-3478)) = TFAsolutionmax.val;
-
-                % Change the objective rxn to 0
-                model3.f (k) = 0;
+                Fluxmax_TFA (i, j, k) = TFAsolutionmax.val;
+            catch
+                Fluxmin_TFA (i, j, k) = NaN;
+                Fluxmax_TFA (i, j, k) = NaN;
             end
             
-        catch
-            Fluxmin_TFA (i, j, :) = NaN;
-            Fluxmax_TFA (i, j, :) = NaN;
+            % Change the objective rxn to 0
+            model3.f (k) = 0;
         end
+        
+        % print an update
+        fprintf('Finished TFA flux analysis for:\t%s\t%s\n',Rxn{i},O2_label{j});        
+        
     end
     
     % Set the substrate flux to 0
     model2 = changeTFArxnBounds (model2, Rxn(i), 0, 'l');
-
+    
 end
 
 
@@ -163,7 +181,7 @@ for i = 1:length(Rxn)
                     Comp_Struct.number (k,j,i) = -1;
                 end
 
-            % Else if the TFA rxn is bidirectional    
+            % Else the TFA rxn is bidirectional    
             else
                 Comp_Struct.number (k,j,i) = 0;
             end

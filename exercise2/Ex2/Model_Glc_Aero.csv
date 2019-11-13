@@ -387,10 +387,10 @@ LMPD_39_btn_c,0
 LMPD_40_btn_c,0
 LMPD_41_btn_c,0
 LMPD_42_btn_c,0
-LMPD_43_btn_c,-1
-LMPD_44_btn_c,-1
-LMPD_45_btn_c,-1
-LMPD_47_btn_c,-1
+LMPD_43_btn_c,0
+LMPD_44_btn_c,0
+LMPD_45_btn_c,0
+LMPD_47_btn_c,0
 LMPD_48_ca2_c,0
 LMPD_49_ca2_c,0
 LMPD_50_ca2_c,0
@@ -566,7 +566,7 @@ LMPD_219_pheme_c,0
 LMPD_220_pro-L_c,0
 LMPD_221_ptrc_c,0
 LMPD_222_pydx5p_c,0
-LMPD_223_pydx5p_c,1
+LMPD_223_pydx5p_c,0
 LMPD_224_q8h2_c,0
 LMPD_225_q8h2_c,0
 LMPD_226_q8h2_c,0

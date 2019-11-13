@@ -79,7 +79,7 @@ ACONTb,0
 ACS,0
 ACSERtex,0
 ACt2rpp,0
-ACtex,0
+ACtex,1
 ADK1,0
 AKGDH,0
 AKGt2rpp,0
@@ -106,7 +106,7 @@ ATPM,0
 ATPS4rpp,0
 CA2tex,0
 CAt6pp,0
-CBL1tonex,0
+CBL1tonex,1
 CITL,0
 CITt3pp,0
 CITt7pp,0
@@ -142,7 +142,7 @@ EDA,0
 EDD,0
 ENO,0
 ETOHtex,0
-ETOHtrpp,0
+ETOHtrpp,1
 F6PA,0
 FBA,0
 FBA3,0
@@ -358,8 +358,8 @@ LMPD_10_2fe2s_c,0
 LMPD_11_2fe2s_c,0
 LMPD_12_2fe2s_c,0
 LMPD_13_2fe2s_c,0
-LMPD_14_4fe4s_c,0
-LMPD_15_4fe4s_c,0
+LMPD_14_4fe4s_c,1
+LMPD_15_4fe4s_c,1
 LMPD_16_4fe4s_c,0
 LMPD_17_4fe4s_c,0
 LMPD_18_4fe4s_c,0
