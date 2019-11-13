@@ -38,7 +38,7 @@ parfor i = 1:end_i
     
     % copy model
     model1 = model;
-
+    
     % Set the substrate flux
     model1 = changeRxnBounds (model1, Rxn(i), -10, 'l');
     
@@ -62,7 +62,7 @@ parfor i = 1:end_i
             Fluxmin_FBA (i, j, k) = FBAsolutionmin.f;
             FBAsolutionmax = optimizeCbModel (model1, 'max');
             Fluxmax_FBA (i, j, k) = FBAsolutionmax.f;
-
+            
         end
         
         % print an update
@@ -70,7 +70,7 @@ parfor i = 1:end_i
     end
     
     model1 = changeRxnBounds (model1, Rxn(i), 0, 'l');
-
+    
 end
 
 %% Load the thermodynamics database
@@ -104,7 +104,7 @@ parfor i = 1:end_i
     
     % copy model
     model2 = TFA_model;
-
+    
     % Set the substrate flux to -10
     model2 = changeTFArxnBounds (model2, Rxn(i), -10, 'l');
     
@@ -118,53 +118,53 @@ parfor i = 1:end_i
         objVarIndex = find_cell(objVar, model3.varNames);
         model3.f(objVarIndex) = 1;
         
-        % Determine the maximum biomass production and set it as constant
-        TFAsolution = solveTFAmodelCplex (model3);
-        model3 = changeTFArxnBounds (model3, 'Ec_biomass_iJO1366_WT_53p95M', TFAsolution.val, 'b');
-        
-        % Change the objective rxn biomass to 0
-        model3.f (objVarIndex) = 0;
-        
-        % Flux analysis
-        for k = 1:end_k
-            k_ = k+3478; % index of NF variable
+        try
+            % Determine the maximum biomass production and set it as constant
+            TFAsolution = solveTFAmodelCplex (model3);
+            model3 = changeTFArxnBounds (model3, 'Ec_biomass_iJO1366_WT_53p95M', TFAsolution.val, 'b');
             
-            % Change the objective rxn to 1
-            model3.f (k_) = 1;
+            % Change the objective rxn biomass to 0
+            model3.f (objVarIndex) = 0;
             
-            try
-                % Daniel's approach
-                % Set direction to minimise & solve
-                model3.f(k_) = -1;
-                TFAsolutionmin = solveTFAmodelCplex(model3);
-                Fluxmin_TFA(i, j, k) = -TFAsolutionmin.val;
+            % Flux analysis
+            for k = 1:end_k
+                k_ = k+3478; % index of NF variable
                 
-                % Set direction to maximise & solve
-                model3.f(k_) = 1;
-                TFAsolutionmax = solveTFAmodelCplex(model3);
-                Fluxmax_TFA(i, j, k) = TFAsolutionmax.val;
-
-                % Andreas' approach
+                % Change the objective rxn to 1
+                model3.f (k_) = 1;
+                
+                % Daniel's approach
 %                 % Set direction to minimise & solve
-%                 model3.objtype = +1;
+%                 model3.f(k_) = -1;
 %                 TFAsolutionmin = solveTFAmodelCplex(model3);
-%                 Fluxmin_TFA(i, j, k) = TFAsolutionmin.val;
+%                 Fluxmin_TFA(i, j, k) = -TFAsolutionmin.val;
 %                 
 %                 % Set direction to maximise & solve
-%                 model3.objtype = -1;
+%                 model3.f(k_) = 1;
 %                 TFAsolutionmax = solveTFAmodelCplex(model3);
 %                 Fluxmax_TFA(i, j, k) = TFAsolutionmax.val;
-            catch
-                % Fluxmin_TFA and Fluxmax_TFA are initialised as NaN, so no
-                % need to re-assign here
+                
+                % Andreas' approach
+                % Set direction to minimise & solve
+                model3.objtype = +1;
+                TFAsolutionmin = solveTFAmodelCplex(model3);
+                Fluxmin_TFA(i, j, k) = TFAsolutionmin.val;
+                
+                % Set direction to maximise & solve
+                model3.objtype = -1;
+                TFAsolutionmax = solveTFAmodelCplex(model3);
+                Fluxmax_TFA(i, j, k) = TFAsolutionmax.val;
+                
+                % Change the objective rxn to 0
+                model3.f (k_) = 0;
             end
             
-            % Change the objective rxn to 0
-            model3.f (k_) = 0;
+        catch
+            fprintf('Failed TFA flux analysis for:\t%s\t%s\n',Rxn{i},O2_label{j});
         end
         
         % print an update
-        fprintf('Finished TFA flux analysis for:\t%s\t%s\n',Rxn{i},O2_label{j});        
+        fprintf('Finished TFA flux analysis for:\t%s\t%s\n',Rxn{i},O2_label{j});
         
     end
     
@@ -180,30 +180,30 @@ Comp_Struct.rxns = TFA_model.rxns;
 Comp_Struct.number = NaN(length(TFA_model.rxns), length (O2), length (Rxn));
 
 for i = 1:end_i
-    for j = 1:end_j  
+    for j = 1:end_j
         for k = 1:end_k
-
+            
             % Check if the TFA rxn is forward
             if Fluxmax_TFA(i,j,k) > 0 && Fluxmin_TFA (i,j,k) > 0
-
+                
                 % Check if the FBA rxn is forward
                 if Fluxmax_FBA(i,j,k) > 0 && Fluxmin_FBA (i,j,k) > 0
                     Comp_Struct.number (k,j,i) = 0;
                 else
                     Comp_Struct.number (k,j,i) = 1;
                 end
-
-            % Check if the TFA rxn is backward
+                
+                % Check if the TFA rxn is backward
             elseif Fluxmax_TFA(i,j,k) < 0 && Fluxmin_TFA (i,j,k) < 0
-
+                
                 % Check if the FBA rxn is backward
                 if Fluxmax_FBA(i,j,k) < 0 && Fluxmin_FBA (i,j,k) < 0
                     Comp_Struct.number (k,j,i) = 0;
                 else
                     Comp_Struct.number (k,j,i) = -1;
                 end
-
-            % Else the TFA rxn is bidirectional    
+                
+                % Else the TFA rxn is bidirectional
             else
                 Comp_Struct.number (k,j,i) = 0;
             end
