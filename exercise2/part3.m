@@ -39,28 +39,31 @@ parfor i = 1:end_i
     % copy model
     model1 = model;
     
-    % Set the substrate flux
-    model1 = changeRxnBounds (model1, Rxn(i), -10, 'l');
+    % set the flux of ONE SUBSTRATE AT A TIME
+    fluxes = zeros(1,4);
+    fluxes(i) = -10;
+    model1 = changeRxnBounds (model1, Rxn, fluxes, 'l');
     
     for j = 1:end_j
         
         % Set the O2 flux
-        model1 = changeRxnBounds (model1, 'DM_o2_e', O2(j), 'l');
+        model2 = changeRxnBounds (model1, 'DM_o2_e', O2(j), 'l');
         
         % Determine the maximum biomass production and set it as constant
-        FBAsolution = optimizeCbModel (model1, 'max');
-        model1 = changeRxnBounds (model1, 'Ec_biomass_iJO1366_WT_53p95M', FBAsolution.f, 'b');
+        model2 = changeObjective (model2, 'Ec_biomass_iJO1366_WT_53p95M');
+        FBAsolution = optimizeCbModel (model2, 'max');
+        model2 = changeRxnBounds (model2, 'Ec_biomass_iJO1366_WT_53p95M', FBAsolution.f, 'b');
         
         % Flux analysis
         for k = 1:end_k
             
             % Set the objective reaction
-            model1 = changeObjective (model1, model1.rxns (k));
+            model2 = changeObjective (model2, model.rxns (k));
             
             % Perform the flux analysis
-            FBAsolutionmin = optimizeCbModel (model1, 'min');
+            FBAsolutionmin = optimizeCbModel (model2, 'min');
             Fluxmin_FBA (i, j, k) = FBAsolutionmin.f;
-            FBAsolutionmax = optimizeCbModel (model1, 'max');
+            FBAsolutionmax = optimizeCbModel (model2, 'max');
             Fluxmax_FBA (i, j, k) = FBAsolutionmax.f;
             
         end
@@ -105,8 +108,10 @@ parfor i = 1:end_i
     % copy model
     model2 = TFA_model;
     
-    % Set the substrate flux to -10
-    model2 = changeTFArxnBounds (model2, Rxn(i), -10, 'l');
+    % set the flux of ONE SUBSTRATE AT A TIME
+    fluxes = zeros(1,4);
+    fluxes(i) = -10;
+    model2 = changeRxnBounds (model2, Rxn, fluxes, 'l');
     
     for j = 1:end_j
         
@@ -120,6 +125,7 @@ parfor i = 1:end_i
         
         try
             % Determine the maximum biomass production and set it as constant
+            model3.objtype = -1;
             TFAsolution = solveTFAmodelCplex (model3);
             model3 = changeTFArxnBounds (model3, 'Ec_biomass_iJO1366_WT_53p95M', TFAsolution.val, 'b');
             
@@ -131,20 +137,8 @@ parfor i = 1:end_i
                 k_ = k+3478; % index of NF variable
                 
                 % Change the objective rxn to 1
-                model3.f (k_) = 1;
+                model3.f(k_) = 1;
                 
-                % Daniel's approach
-%                 % Set direction to minimise & solve
-%                 model3.f(k_) = -1;
-%                 TFAsolutionmin = solveTFAmodelCplex(model3);
-%                 Fluxmin_TFA(i, j, k) = -TFAsolutionmin.val;
-%                 
-%                 % Set direction to maximise & solve
-%                 model3.f(k_) = 1;
-%                 TFAsolutionmax = solveTFAmodelCplex(model3);
-%                 Fluxmax_TFA(i, j, k) = TFAsolutionmax.val;
-                
-                % Andreas' approach
                 % Set direction to minimise & solve
                 model3.objtype = +1;
                 TFAsolutionmin = solveTFAmodelCplex(model3);
@@ -156,7 +150,7 @@ parfor i = 1:end_i
                 Fluxmax_TFA(i, j, k) = TFAsolutionmax.val;
                 
                 % Change the objective rxn to 0
-                model3.f (k_) = 0;
+                model3.f(k_) = 0;
             end
             
         catch
