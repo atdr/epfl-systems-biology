@@ -140,7 +140,7 @@ parfor i = 1:end_i
 %                 Fluxmin_TFA (i, j, k) = -TFAsolutionmin.val;
 %                 
 %                 % Set direction to maximise & solve
-%                 model3.f (k) = 1;
+%                 model3.f (k_) = 1;
 %                 TFAsolutionmax = solveTFAmodelCplex(model3);
 %                 Fluxmax_TFA (i, j, k) = TFAsolutionmax.val;
 
@@ -160,7 +160,7 @@ parfor i = 1:end_i
             end
             
             % Change the objective rxn to 0
-            model3.f (k) = 0;
+            model3.f (k_) = 0;
         end
         
         % print an update
