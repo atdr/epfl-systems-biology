@@ -203,16 +203,16 @@ for i = 1:numel(Rxn)
     
     % loop through metabolites
     for k = 1:size(mets,1)
-        %for k = 1:1
         
-        % set objective to maximise LC of the metabolite
+        % set LC of the metabolite as objective
         this_tmodel.f(mets.modelIndexLC(k)) = 1;
-        % solve
+        
+        % set direction to maximise & solve
+        this_tmodel.objtype = -1;
         TFAsolution_max = solveTFAmodelCplex(this_tmodel);
         
-        % set objective to minimise LC of the metabolite
-        this_tmodel.f(mets.modelIndexLC(k)) = -1;
-        % solve
+        % set direction to minimise & solve
+        this_tmodel.objtype = +1; % assume opposite of above
         TFAsolution_min = solveTFAmodelCplex(this_tmodel);
         
         % save the results
