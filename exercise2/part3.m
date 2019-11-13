@@ -16,23 +16,29 @@ O2 = [-20 0];
 O2_label = {'aero', 'anaero'};
 Rxn = {'DM_glc_e','DM_lac-D_e','DM_ac_e','DM_etoh_e' };
 
-%% FBA Flux Analysis
-
-% Save the flux data
-Fluxmin_FBA = NaN (length(Rxn), length (O2), length(model.rxns));
-Fluxmax_FBA = NaN (length(Rxn), length (O2), length(model.rxns));
-
 % pre-calculate length of for loops
 end_i = length(Rxn);
 end_j = length(O2);
 end_k = length(model.rxns);
 
+%% FBA Flux Analysis
+
+% initialise output matrices
+Fluxmin_FBA = NaN(end_i, end_j, end_k);
+Fluxmax_FBA = NaN(end_i, end_j, end_k);
+
+% grab environment to pass to parallel workers
+environment = getEnvironment();
+
 parfor i = 1:end_i
     
-    % copy model & set up solver for each parallel worker
-    model1 = model;
+    % set up environment for each worker
+    restoreEnvironment(environment);
     changeCobraSolver('cplex_direct');
     
+    % copy model
+    model1 = model;
+
     % Set the substrate flux
     model1 = changeRxnBounds (model1, Rxn(i), -10, 'l');
     
@@ -83,16 +89,22 @@ clear tmp
 
 %% TFA Flux Analysis
 
-% Save the flux data
-Fluxmin_TFA = NaN (length(Rxn), length (O2), 599);
-Fluxmax_TFA = NaN (length(Rxn), length (O2), 599);
+% initialise output matrices
+Fluxmin_TFA = NaN(end_i, end_j, end_k);
+Fluxmax_TFA = NaN(end_i, end_j, end_k);
+
+% grab environment to pass to parallel workers
+environment = getEnvironment();
 
 parfor i = 1:end_i
     
-    % copy model & set up solver for each parallel worker
-    model2 = TFA_model;
+    % set up environment for each worker
+    restoreEnvironment(environment);
     changeCobraSolver('cplex_direct');
     
+    % copy model
+    model2 = TFA_model;
+
     % Set the substrate flux to -10
     model2 = changeTFArxnBounds (model2, Rxn(i), -10, 'l');
     
@@ -115,7 +127,7 @@ parfor i = 1:end_i
         
         % Flux analysis
         for k = 1:end_k
-            k_ = k+3478;
+            k_ = k+3478; % index of NF variable
             
             % Change the objective rxn to 1
             % model3.f (k_) = 1;
@@ -131,8 +143,8 @@ parfor i = 1:end_i
                 TFAsolutionmax = solveTFAmodelCplex(model3);
                 Fluxmax_TFA (i, j, k) = TFAsolutionmax.val;
             catch
-                Fluxmin_TFA (i, j, k) = NaN;
-                Fluxmax_TFA (i, j, k) = NaN;
+                % Fluxmin_TFA and Fluxmax_TFA are initialised as NaN, so no
+                % need to re-assign here
             end
             
             % Change the objective rxn to 0
@@ -155,11 +167,9 @@ end
 Comp_Struct.rxns = TFA_model.rxns;
 Comp_Struct.number = NaN(length(TFA_model.rxns), length (O2), length (Rxn));
 
-for i = 1:length(Rxn)
-    
-    for j = 1:length (O2)
-        
-        for k = 1: length (TFA_model.rxns)
+for i = 1:end_i
+    for j = 1:end_j  
+        for k = 1:end_k
 
             % Check if the TFA rxn is forward
             if Fluxmax_TFA(i,j,k) > 0 && Fluxmin_TFA (i,j,k) > 0
@@ -185,6 +195,7 @@ for i = 1:length(Rxn)
             else
                 Comp_Struct.number (k,j,i) = 0;
             end
+            
         end
     end
 end
