@@ -134,26 +134,26 @@ parfor i = 1:end_i
             
             try
                 % Daniel's approach
-%                 % Set direction to minimise & solve
-%                 model3.f (k_) = -1;
-%                 TFAsolutionmin = solveTFAmodelCplex(model3);
-%                 Fluxmin_TFA (i, j, k) = -TFAsolutionmin.val;
-%                 
-%                 % Set direction to maximise & solve
-%                 model3.f (k_) = 1;
-%                 TFAsolutionmax = solveTFAmodelCplex(model3);
-%                 Fluxmax_TFA (i, j, k) = TFAsolutionmax.val;
-
-                % Andreas' approach
                 % Set direction to minimise & solve
-                model3.objtype = +1;
+                model3.f(k_) = -1;
                 TFAsolutionmin = solveTFAmodelCplex(model3);
-                Fluxmin_TFA(i, j, k) = TFAsolutionmin.val;
+                Fluxmin_TFA(i, j, k) = -TFAsolutionmin.val;
                 
                 % Set direction to maximise & solve
-                model3.objtype = -1;
+                model3.f(k_) = 1;
                 TFAsolutionmax = solveTFAmodelCplex(model3);
                 Fluxmax_TFA(i, j, k) = TFAsolutionmax.val;
+
+                % Andreas' approach
+%                 % Set direction to minimise & solve
+%                 model3.objtype = +1;
+%                 TFAsolutionmin = solveTFAmodelCplex(model3);
+%                 Fluxmin_TFA(i, j, k) = TFAsolutionmin.val;
+%                 
+%                 % Set direction to maximise & solve
+%                 model3.objtype = -1;
+%                 TFAsolutionmax = solveTFAmodelCplex(model3);
+%                 Fluxmax_TFA(i, j, k) = TFAsolutionmax.val;
             catch
                 % Fluxmin_TFA and Fluxmax_TFA are initialised as NaN, so no
                 % need to re-assign here
