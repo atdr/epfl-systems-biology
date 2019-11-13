@@ -220,3 +220,15 @@ writetable(Model_Et_Aero, [pwd '/Ex2/Model_Et_Aero.csv']);
 Model_Et_Anaero = table (Comp_Struct.rxns, Comp_Struct.number(:,2,4));
 writetable(Model_Et_Anaero, [pwd '/Ex2/Model_Et_Anaero.csv']);
 
+%% short export
+
+for i = 1:end_i
+    for j = 1:end_j
+        % create table of reactions
+        T = table(Comp_Struct.rxns, Comp_Struct.number(:,j,i));
+        % export all
+        writetable(T, [pwd '/out/' Rxn{i} '_' O2_label{j} '.csv']);
+        % export only ones that have changed
+        writetable(T(T{:,2}~=0,:), [pwd '/out/' Rxn{i} '_' O2_label{j} '_changed.csv']);
+    end
+end
